@@ -100,4 +100,4 @@ We appreciate your contributions and your efforts to maintain the quality and fu
 
 If you have any questions about this project, contributing to it, or why I've made the choices I have, please don't be a stranger! 
 
-You can e-mail me at [canceb@gmail.com](canceb@gmail.com)
+You can e-mail me at canceb@gmail.com
