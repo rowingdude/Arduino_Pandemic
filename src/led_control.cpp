@@ -16,13 +16,18 @@
  * MIT License
  *****************************************************************************/
 
+#include "led_control.h"
+#include "city_map.h"
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
 #define LED_PORT PORTF
 #define LED_DDR  DDRF
 #define LED_PIN  PF6
 
 void initializeLEDs() {
     LED_DDR |= _BV(LED_PIN);  // Set LED pin as output
-}
+}  // Function initializes the LED pin for direct control
 
 void sendBit(uint8_t bit) {
     LED_PORT |= _BV(LED_PIN);
@@ -32,13 +37,13 @@ void sendBit(uint8_t bit) {
                  "nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\n");
     LED_PORT &= ~_BV(LED_PIN);
     asm volatile("nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\n");
-}
+}  // Function sends a single bit to the LED strip
 
 void sendColor(uint8_t r, uint8_t g, uint8_t b) {
     for(uint8_t i = 8; i; i--) sendBit(g & 0x80), g <<= 1;
     for(uint8_t i = 8; i; i--) sendBit(r & 0x80), r <<= 1;
     for(uint8_t i = 8; i; i--) sendBit(b & 0x80), b <<= 1;
-}
+}  // Function sends a full RGB color to the LED strip
 
 void updateCityLEDs(uint8_t cityIndex) {
     uint8_t level = cityInfectionLevels[cityIndex];
@@ -54,4 +59,4 @@ void updateCityLEDs(uint8_t cityIndex) {
         sendColor(i < endLED ? r : 0, g, b);
     }
     sei();  // Re-enable interrupts
-}
+}  // Function updates LEDs for a specific city based on infection level
