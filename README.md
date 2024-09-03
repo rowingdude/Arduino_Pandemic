@@ -1,7 +1,3 @@
-Here’s a welcoming `README.md` document for your project:
-
----
-
 # Arduino_Pandemic
 
 Welcome to Arduino_Pandemic! This project is an open-source initiative aimed at [brief description of the project's purpose or goal]. Whether you're here to use the project, contribute, or simply explore, we're glad to have you!
