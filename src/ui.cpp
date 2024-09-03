@@ -21,34 +21,32 @@ uint32_t lastDebounceTimes[4] = {0};
 const uint32_t debounceDelay = 50;
 
 void initializeButtons() {
-  for (int i = 0; i < 4; i++) {
-    pinMode(buttonPins[i], INPUT_PULLUP);
-  }
-}
+    for (int i = 0; i < 4; i++) {
+        pinMode(buttonPins[i], INPUT_PULLUP);
+    }
+}  // Function initializes button pins
 
 void handleButtonInputs() {
-  uint32_t currentTime = millis();
-  for (int i = 0; i < 4; i++) {
-    uint8_t reading = digitalRead(buttonPins[i]);
-    if (reading != lastButtonStates[i]) {
-      lastDebounceTimes[i] = currentTime;
+    uint32_t currentTime = millis();
+    for (int i = 0; i < 4; i++) {
+        uint8_t reading = digitalRead(buttonPins[i]);
+        uint8_t timeDiff = currentTime - lastDebounceTimes[i];
+        lastDebounceTimes[i] += (reading != lastButtonStates[i]) * timeDiff;
+        performAction(i * (reading == LOW && timeDiff > debounceDelay));
+        lastButtonStates[i] = reading;
     }
-    if ((currentTime - lastDebounceTimes[i]) > debounceDelay) {
-      if (reading == LOW) {
-        performAction(i);
-      }
-    }
-    lastButtonStates[i] = reading;
-  }
-}
+}  // Function handles button inputs with debouncing
 
 void performAction(uint8_t actionIndex) {
-  static const ActionFunction actions[] = {
-    movePlayer,
-    treatDisease,
-    buildResearchStation,
-    shareKnowledge
-  };
-  actions[actionIndex]();
-  decrementActionsRemaining();
-}
+    static const ActionFunction actions[] = {
+        movePlayer,
+        treatDisease,
+        buildResearchStation,
+        shareKnowledge
+    };
+    actions[actionIndex]();
+}  // Function performs the action corresponding to the button pressed
+
+void updateLCDDisplay() {
+    // Placeholder for LCD update logic
+}  // Function updates the LCD display (to be implemented)

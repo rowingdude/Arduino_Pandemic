@@ -15,39 +15,38 @@
 #include "city_map.h"
 #include "led_control.h"
 #include "random_generator.h"
+#include "disease_management.h"
 
+const char* cityNames[CITY_COUNT] = {/* ... city names ... */};
 uint8_t cityInfectionLevels[CITY_COUNT] = {0};
 
 void shuffleCities() {
-  for (int i = CITY_COUNT - 1; i > 0; i--) {
-    int j = getRandomNumber() % (i + 1);
-    const char* temp = cityNames[i];
-    cityNames[i] = cityNames[j];
-    cityNames[j] = temp;
-  }
-}
+    for (int i = CITY_COUNT - 1; i > 0; i--) {
+        int j = getRandomNumber() % (i + 1);
+        const char* temp = cityNames[i];
+        cityNames[i] = cityNames[j];
+        cityNames[j] = temp;
+    }
+}  // Function shuffles the city names array
 
 void setInitialInfections() {
-  static const uint8_t initialInfections[] = {3, 3, 3, 2, 2, 2, 1, 1, 1};
-  for (int i = 0; i < 9; i++) {
-    setCityInfectionLevel(i, initialInfections[i]);
-  }
-}
+    static const uint8_t initialInfections[] = {3, 3, 3, 2, 2, 2, 1, 1, 1};
+    for (int i = 0; i < 9; i++) {
+        setCityInfectionLevel(i, initialInfections[i]);
+    }
+}  // Function sets initial infection levels for 9 cities
 
 void setCityInfectionLevel(uint8_t cityIndex, uint8_t level) {
-  cityInfectionLevels[cityIndex] = level & 0x03; 
-  updateCityLEDs(cityIndex);
-}
+    cityInfectionLevels[cityIndex] = level & 0x03;  // Limit to 0-3
+    updateCityLEDs(cityIndex);
+}  // Function sets infection level and updates LEDs
 
 void incrementCityInfection(uint8_t cityIndex) {
-  uint8_t newLevel = (cityInfectionLevels[cityIndex] + 1) & 0x03; 
-  setCityInfectionLevel(cityIndex, newLevel);
-  
-  if (newLevel == 0) {
-    triggerOutbreak(cityIndex);
-  }
-}
+    uint8_t newLevel = (cityInfectionLevels[cityIndex] + 1) & 0x03;
+    setCityInfectionLevel(cityIndex, newLevel);
+    triggerOutbreak(cityIndex * (newLevel == 0));
+}  // Function increments infection level and potentially triggers outbreak
 
 void triggerOutbreak(uint8_t cityIndex) {
-  // add an outbreak, triggering neighbors and future outbreaks.
-}
+    // Placeholder for outbreak logic
+}  // Function handles city outbreak (to be implemented)

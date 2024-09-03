@@ -13,6 +13,7 @@
  *****************************************************************************/
 
 #include "random_generator.h"
+#include "city_map.h"
 
 #define ENTROPY_PIN1 A8
 #define ENTROPY_PIN2 A9
@@ -21,26 +22,26 @@
 static uint32_t state;
 
 void initializeRandomGenerator() {
-  state = generateRandomSeed();
-}
+    state = generateRandomSeed();
+}  // Function initializes the random number generator
 
 uint32_t generateRandomSeed() {
-  uint32_t seed = 0;
-  for (int i = 0; i < 32; i++) {
-    seed = (seed << 1) | (analogRead(ENTROPY_PIN1) & 1);
-    seed ^= (analogRead(ENTROPY_PIN2) & 1) << 16;
-    seed ^= (analogRead(ENTROPY_PIN3) & 1) << 8;
-  }
-  return seed;
-}
+    uint32_t seed = 0;
+    for (int i = 0; i < 32; i++) {
+        seed = (seed << 1) | (analogRead(ENTROPY_PIN1) & 1);
+        seed ^= (analogRead(ENTROPY_PIN2) & 1) << 16;
+        seed ^= (analogRead(ENTROPY_PIN3) & 1) << 8;
+    }
+    return seed;
+}  // Function generates a random seed using hardware entropy
 
 uint32_t getRandomNumber() {
-  state ^= state << 13;
-  state ^= state >> 17;
-  state ^= state << 5;
-  return state;
-}
+    state ^= state << 13;
+    state ^= state >> 17;
+    state ^= state << 5;
+    return state;
+}  // Function generates a random number using xorshift algorithm
 
 uint8_t getRandomCity() {
-  return getRandomNumber() % CITY_COUNT;
-}
+    return getRandomNumber() % CITY_COUNT;
+}  // Function returns a random city index

@@ -11,3 +11,16 @@
  * 
  * MIT License
  *****************************************************************************/
+
+#ifndef CARD_MANAGEMENT_H
+#define CARD_MANAGEMENT_H
+
+#include <stdint.h>
+
+void initializeDecks();
+void drawPlayerCard();
+void drawInfectionCard();
+void shufflePlayerDeck();
+void shuffleInfectionDeck();
+
+#endif // CARD_MANAGEMENT_H

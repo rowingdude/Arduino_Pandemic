@@ -11,3 +11,23 @@
  * 
  * MIT License
  *****************************************************************************/
+
+ 
+#ifndef CITY_MAP_H
+#define CITY_MAP_H
+
+#include <stdint.h>
+
+#define CITY_COUNT 48
+#define LEDS_PER_CITY 3
+
+extern const char* cityNames[CITY_COUNT];
+extern uint8_t cityInfectionLevels[CITY_COUNT];
+
+void shuffleCities();
+void setInitialInfections();
+void setCityInfectionLevel(uint8_t cityIndex, uint8_t level);
+void incrementCityInfection(uint8_t cityIndex);
+void triggerOutbreak(uint8_t cityIndex);
+
+#endif // CITY_MAP_H

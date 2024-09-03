@@ -11,3 +11,15 @@
  * 
  * MIT License
  *****************************************************************************/
+
+#ifndef UI_H
+#define UI_H
+
+#include <stdint.h>
+
+void initializeButtons();
+void handleButtonInputs();
+void performAction(uint8_t actionIndex);
+void updateLCDDisplay();
+
+#endif // UI_H

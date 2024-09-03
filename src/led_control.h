@@ -11,3 +11,15 @@
  * 
  * MIT License
  *****************************************************************************/
+
+ 
+#ifndef LED_CONTROL_H
+#define LED_CONTROL_H
+
+#include <stdint.h>
+#include <Adafruit_NeoPixel.h>
+
+void initializeLEDs();
+void updateCityLEDs(uint8_t cityIndex);
+
+#endif // LED_CONTROL_H

@@ -12,4 +12,16 @@
  * MIT License
  *****************************************************************************/
 
+#ifndef RNG_H
+#define RNG_H
+
+#include <stdint.h>
+
+void initializeRandomGenerator();
+uint32_t generateRandomSeed();
+uint32_t getRandomNumber();
+uint8_t getRandomCity();
+
+#endif // RNG_H
+
  

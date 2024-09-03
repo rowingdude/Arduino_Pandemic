@@ -11,3 +11,17 @@
  * 
  * MIT License
  *****************************************************************************/
+
+#ifndef PLAYER_ACTIONS_H
+#define PLAYER_ACTIONS_H
+
+#include <stdint.h>
+
+void movePlayer();
+void treatDisease();
+void buildResearchStation();
+void shareKnowledge();
+
+typedef void (*ActionFunction)();
+
+#endif // PLAYER_ACTIONS_H

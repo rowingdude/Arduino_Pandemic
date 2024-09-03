@@ -11,3 +11,27 @@
  * 
  * MIT License
  *****************************************************************************/
+
+#include "player_actions.h"
+#include "game_state.h"
+#include "city_map.h"
+
+void movePlayer() {
+    // Placeholder for move logic
+    decrementActionsRemaining();
+}  // Function handles player movement
+
+void treatDisease() {
+    // Placeholder for treat disease logic
+    decrementActionsRemaining();
+}  // Function handles disease treatment
+
+void buildResearchStation() {
+    // Placeholder for build research station logic
+    decrementActionsRemaining();
+}  // Function handles building a research station
+
+void shareKnowledge() {
+    // Placeholder for share knowledge logic
+    decrementActionsRemaining();
+}  // Function handles knowledge sharing between players
