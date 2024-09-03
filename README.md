@@ -6,7 +6,7 @@ Welcome to Arduino_Pandemic! This project is an open-source initiative aimed at 
 
 ## Introduction
 
-Arduino_Pandemic is designed to [briefly explain what the project does, e.g., "help manage and visualize game state in real-time using LED displays"]. Our goal is to create a robust and flexible tool that can be used by developers, hobbyists, and enthusiasts alike.
+Arduino_Pandemic is designed to automate the tedious parts of the game (setup, shuffling, dice). Our goal is to create a robust and flexible tool that can be used by fans of the game to play through in a more timely manner and test new strategies.
 
 Whether you're interested in using the project for your own purposes or contributing to its development, we welcome you to join our community.
 
