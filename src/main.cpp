@@ -11,3 +11,28 @@
  * 
  * MIT License
  *****************************************************************************/
+
+#include <Arduino.h>
+#include "game_state.h"
+#include "city_map.h"
+#include "player_actions.h"
+#include "led_control.h"
+#include "rng.h"
+#include "ui.h"
+
+void setup() {
+  Serial.begin(9600);
+  initializeRandomGenerator();
+  initializeLEDs();
+  initializeLCDs();
+  initializeButtons();
+  initializeGameState();
+  shuffleCities();
+  setInitialInfections();
+  updateLCDDisplay();
+}
+
+void loop() {
+  handleButtonInputs();
+  // Add more stuff as we go... 
+}
