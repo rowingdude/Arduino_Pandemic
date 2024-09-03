@@ -17,21 +17,36 @@ static uint8_t diseaseCubes[DISEASE_COUNT] = {24, 24, 24, 24};
 static uint8_t curedDiseases = 0;
 
 void initializeDiseases() {
-    for (int i = 0; i < DISEASE_COUNT; i++) {
-        diseaseCubes[i] = 24;
+    for (uint8_t i = 0; i < CITY_COUNT; i++) {
+        diseaseCubes[i] = 0;
     }
-    curedDiseases = 0;
-}  // Function initializes disease cubes and cure status
+}  // Function initializes disease cube counts for all cities
 
-void addDiseaseCube(uint8_t cityIndex, uint8_t diseaseType) {
-    diseaseCubes[diseaseType] = (diseaseCubes[diseaseType] > 0) * (diseaseCubes[diseaseType] - 1);
-    // City infection logic to be implemented
-}  // Function adds a disease cube to a city
+bool addDiseaseCube(uint8_t cityIndex) {
+    if (diseaseCubes[cityIndex] < MAX_CUBES_PER_CITY) {
+        diseaseCubes[cityIndex]++;
+        updateCityLEDs(cityIndex);
+        return true;
+    } else {
+        spreadDisease(cityIndex);
+        return false;
+    }
+}  // Function adds a disease cube to a city, triggers spread if at max
 
-void removeDiseaseCube(uint8_t cityIndex, uint8_t diseaseType) {
-    diseaseCubes[diseaseType] = (diseaseCubes[diseaseType] < 24) * (diseaseCubes[diseaseType] + 1);
-    // City disinfection logic to be implemented
+void removeDiseaseCube(uint8_t cityIndex) {
+    if (diseaseCubes[cityIndex] > 0) {
+        diseaseCubes[cityIndex]--;
+        updateCityLEDs(cityIndex);
+    }
 }  // Function removes a disease cube from a city
+
+void spreadDisease(uint8_t startCity) {
+    for (uint8_t i = 0; i < CITY_COUNT; i++) {
+        if (areCitiesConnected(startCity, i)) {
+            addDiseaseCube(i);
+        }
+    }
+}  // Function spreads disease to all connected cities
 
 bool isDiseaseCured(uint8_t diseaseType) {
     return (curedDiseases >> diseaseType) & 1;
