@@ -21,9 +21,18 @@
 #define CITY_COUNT 48
 #define LEDS_PER_CITY 3
 
+#define MAX_RESEARCH_CENTERS 6
+
+extern uint8_t researchCenters;
+extern uint8_t cityHasResearchCenter[CITY_COUNT / 8 + 1];
 extern const char* cityNames[CITY_COUNT];
 extern uint8_t cityInfectionLevels[CITY_COUNT];
 
+
+void initializeCityMap();
+bool addResearchCenter(uint8_t cityIndex);
+bool hasResearchCenter(uint8_t cityIndex);
+void removeResearchCenter(uint8_t cityIndex);
 void shuffleCities();
 void setInitialInfections();
 void setCityInfectionLevel(uint8_t cityIndex, uint8_t level);

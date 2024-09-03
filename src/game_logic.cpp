@@ -48,17 +48,13 @@ void performPlayerTurn(uint8_t playerIndex) {
                     removeDiseaseCube(currentCity);
                     actionsLeft--;
                 }
-            
             case RESEARCHCTR:
                 {
                     uint8_t currentCity = players[playerIndex].location;
-                    addResearchCenter(currentCity);
-                    actionsLeft--;
+                    if (addResearchCenter(currentCity)) {
+                        actionsLeft--;
+                    }
                 }
-            
-            case 
-            
-            case 
                 break;
         }
     }

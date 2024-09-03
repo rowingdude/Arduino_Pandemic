@@ -46,17 +46,24 @@ void sendColor(uint8_t r, uint8_t g, uint8_t b) {
 }  // Function sends a full RGB color to the LED strip
 
 void updateCityLEDs(uint8_t cityIndex) {
-    uint8_t level = cityInfectionLevels[cityIndex];
-    uint8_t r = level > 0 ? 255 : 0;
-    uint8_t g = 0;
-    uint8_t b = 0;
+    uint8_t diseaseLevel = diseaseCubes[cityIndex];
+    bool hasCenter = hasResearchCenter(cityIndex);
+    
+    uint8_t r = diseaseLevel > 0 ? 255 : 0;
+    uint8_t g = hasCenter ? 255 : 0;
+    uint8_t b = 0;  // We could use blue for a different game feature if needed
     
     uint16_t startLED = cityIndex * LEDS_PER_CITY;
-    uint16_t endLED = startLED + level;
     
-    cli();  // Disable interrupts
+    cli(); 
     for (uint16_t i = startLED; i < startLED + LEDS_PER_CITY; i++) {
-        sendColor(i < endLED ? r : 0, g, b);
+        if (i < startLED + diseaseLevel) {
+            sendColor(r, 0, 0);  // Red for disease cubes
+        } else if (i == startLED + LEDS_PER_CITY - 1 && hasCenter) {
+            sendColor(0, g, 0);  // Green for research center
+        } else {
+            sendColor(0, 0, 0);  // Off for no feature
+        }
     }
-    sei();  // Re-enable interrupts
-}  // Function updates LEDs for a specific city based on infection level
+    sei(); 
+}  // Function updates LEDs to show disease levels and research centers

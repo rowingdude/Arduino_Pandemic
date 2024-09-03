@@ -19,7 +19,39 @@
 
 const char* cityNames[CITY_COUNT] = {/* ... city names ... */};
 uint8_t cityInfectionLevels[CITY_COUNT] = {0};
+uint8_t researchCenters = 0;
+uint8_t cityHasResearchCenter[CITY_COUNT / 8 + 1] = {0};
 
+void initializeCityMap() {
+    researchCenters = 0;
+    for (uint8_t i = 0; i < (CITY_COUNT / 8 + 1); i++) {
+        cityHasResearchCenter[i] = 0;
+    }
+    addResearchCenter(ATLANTA); // Default placement
+}  // Function initializes the city map and places initial research center
+
+bool addResearchCenter(uint8_t cityIndex) {
+    if (researchCenters >= MAX_RESEARCH_CENTERS || hasResearchCenter(cityIndex)) {
+        return false;
+    }
+    
+    cityHasResearchCenter[cityIndex / 8] |= (1 << (cityIndex % 8));
+    researchCenters++;
+    updateCityLEDs(cityIndex);  // Update LED to show research center
+    return true;
+}  // Function adds a research center to a city if possible
+
+bool hasResearchCenter(uint8_t cityIndex) {
+    return cityHasResearchCenter[cityIndex / 8] & (1 << (cityIndex % 8));
+}  // Function checks if a city has a research center
+
+void removeResearchCenter(uint8_t cityIndex) {
+    if (hasResearchCenter(cityIndex)) {
+        cityHasResearchCenter[cityIndex / 8] &= ~(1 << (cityIndex % 8));
+        researchCenters--;
+        updateCityLEDs(cityIndex);  // Update LED to show removal of research center
+    }
+}  // Function removes a research center from a city
 void shuffleCities() {
     for (int i = CITY_COUNT - 1; i > 0; i--) {
         int j = getRandomNumber() % (i + 1);
