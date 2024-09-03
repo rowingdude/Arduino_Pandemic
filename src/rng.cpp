@@ -14,33 +14,45 @@
 
 #include "random_generator.h"
 #include "city_map.h"
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
-#define ENTROPY_PIN1 A8
-#define ENTROPY_PIN2 A9
-#define ENTROPY_PIN3 A10
-
-static uint32_t state;
+volatile uint32_t entropy = 0;
+volatile uint8_t entropyReady = 0;
 
 void initializeRandomGenerator() {
-    state = generateRandomSeed();
-}  // Function initializes the random number generator
+    // Set up ADC
+    ADCSRA = _BV(ADEN) | _BV(ADATE) | _BV(ADIE) | 0x07;  // Enable ADC, auto-trigger, interrupt, and set prescaler to 128
+    ADCSRB = 0x00;  // Free running mode
+    ADMUX = 0x40;   // Use AVCC as reference and select ADC0
+    
+    // Set up Timer1 for periodic ADC triggering
+    TCCR1A = 0;
+    TCCR1B = _BV(WGM12) | _BV(CS10);  // CTC mode, no prescaling
+    OCR1A = 1000;  // Set for approximately 16kHz interrupt rate
+    TIMSK1 = _BV(OCIE1A);  // Enable compare match interrupt
+    
+    sei();  // Enable global interrupts
+}
 
-uint32_t generateRandomSeed() {
-    uint32_t seed = 0;
-    for (int i = 0; i < 32; i++) {
-        seed = (seed << 1) | (analogRead(ENTROPY_PIN1) & 1);
-        seed ^= (analogRead(ENTROPY_PIN2) & 1) << 16;
-        seed ^= (analogRead(ENTROPY_PIN3) & 1) << 8;
+ISR(TIMER1_COMPA_vect) {
+    ADCSRA |= _BV(ADSC);  // Start ADC conversion
+}
+
+ISR(ADC_vect) {
+    static uint8_t count = 0;
+    entropy = (entropy << 1) | (ADC & 1);
+    if (++count == 32) {
+        entropyReady = 1;
+        count = 0;
     }
-    return seed;
-}  // Function generates a random seed using hardware entropy
+}
 
 uint32_t getRandomNumber() {
-    state ^= state << 13;
-    state ^= state >> 17;
-    state ^= state << 5;
-    return state;
-}  // Function generates a random number using xorshift algorithm
+    while (!entropyReady);
+    entropyReady = 0;
+    return entropy;
+}
 
 uint8_t getRandomCity() {
     return getRandomNumber() % CITY_COUNT;
