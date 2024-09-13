@@ -45,17 +45,51 @@ void performPlayerAction(uint8_t playerIndex) {
             handlePlayerMove(playerIndex);
             break;
         case ACTION_TREAT:
-            handleTreatDisease(playerIndex);
+            if (players[playerIndex].role == ROLE_MEDIC) {
+                medicTreatDisease(playerIndex, players[playerIndex].location);
+            } else {
+                handleTreatDisease(playerIndex);
+            }
             break;
         case ACTION_BUILD:
-            handleBuildResearchStation(playerIndex);
+            if (players[playerIndex].role == ROLE_OPERATIONS_EXPERT) {
+                operationsExpertBuildStation(playerIndex);
+            } else {
+                handleBuildResearchStation(playerIndex);
+            }
             break;
         case ACTION_CURE:
-            handleDiscoverCure(playerIndex);
+            if (players[playerIndex].role == ROLE_SCIENTIST) {
+                scientistDiscoverCure(playerIndex);
+            } else {
+                handleDiscoverCure(playerIndex);
+            }
             break;
-        // Add more actions as needed
+        case ACTION_SHARE_KNOWLEDGE:
+            if (players[playerIndex].role == ROLE_RESEARCHER) {
+                uint8_t targetPlayer = getTargetPlayer();
+                uint8_t cardIndex = getCardToShare();
+                researcherShareKnowledge(playerIndex, targetPlayer, cardIndex);
+            } else {
+                handleShareKnowledge(playerIndex);
+            }
+            break;
+        case ACTION_DISPATCHER_MOVE:
+            if (players[playerIndex].role == ROLE_DISPATCHER) {
+                uint8_t targetPlayer = getTargetPlayer();
+                uint8_t destination = getDestinationCity();
+                dispatcherMovePlayer(playerIndex, targetPlayer, destination);
+            }
+            break;
+        case ACTION_CONTINGENCY_PLANNER_STORE:
+            if (players[playerIndex].role == ROLE_CONTINGENCY_PLANNER) {
+                uint8_t cardIndex = getEventCardFromDiscard();
+                contingencyPlannerStoreEventCard(playerIndex, cardIndex);
+            }
+            break;
     }
 }
+
 
 void drawPlayerCards(uint8_t playerIndex, uint8_t numCards) {
     for (uint8_t i = 0; i < numCards; i++) {
@@ -68,11 +102,14 @@ void drawPlayerCards(uint8_t playerIndex, uint8_t numCards) {
     }
 }
 
+
 void infectCities() {
     uint8_t infectionRate = getInfectionRate();
     for (uint8_t i = 0; i < infectionRate; i++) {
         Card infectionCard = drawInfectionCard();
-        addDiseaseCube(infectionCard.value, getCityDiseaseType(infectionCard.value));
+        if (!isQuarantineProtected(infectionCard.value)) {
+            addDiseaseCube(infectionCard.value, getCityDiseaseType(infectionCard.value));
+        }
     }
 }
 

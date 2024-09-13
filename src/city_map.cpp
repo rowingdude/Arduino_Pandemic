@@ -87,9 +87,17 @@ void incrementCityInfection(uint8_t cityIndex) {
 }  // Function increments infection level and potentially triggers outbreak
 
 void triggerOutbreak(uint8_t cityIndex) {
+    outbreakCount++;
+    if (outbreakCount > MAX_OUTBREAKS) {
+        // Trigger game over condition
+        return;
+    }
+
+    uint8_t diseaseType = getCityDiseaseType(cityIndex);
+
     for (uint8_t i = 0; i < CITY_COUNT; i++) {
-        if (areCitiesConnected(cityIndex, i)) {
-            incrementCityInfection(i);
+        if (areCitiesConnected(cityIndex, i) && !isQuarantineProtected(i)) {
+            addDiseaseCube(i, diseaseType);
         }
     }
 }

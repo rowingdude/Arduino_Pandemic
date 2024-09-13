@@ -12,7 +12,12 @@ void initializeDiseases() {
     curedDiseases = 0;
 }
 
+
 bool addDiseaseCube(uint8_t cityIndex, uint8_t diseaseType) {
+    if (isQuarantineProtected(cityIndex)) {
+        return true; // Cube placement prevented, but not considered a failure
+    }
+
     if (diseaseCubes[diseaseType] > 0) {
         diseaseCubes[diseaseType]--;
         incrementCityInfection(cityIndex);
@@ -54,9 +59,12 @@ void handleEpidemic() {
 
     // 2. Infect: Draw the bottom card of the infection deck
     Card bottomCard = drawBottomInfectionCard();
-    // Add 3 cubes to the drawn city
-    for (int i = 0; i < 3; i++) {
-        addDiseaseCube(bottomCard.value, getCityDiseaseType(bottomCard.value));
+    
+    // Add 3 cubes to the drawn city, respecting Quarantine Specialist's ability
+    if (!isQuarantineProtected(bottomCard.value)) {
+        for (int i = 0; i < 3; i++) {
+            addDiseaseCube(bottomCard.value, getCityDiseaseType(bottomCard.value));
+        }
     }
 
     // 3. Intensify: Shuffle the infection discard pile and put it on top of the infection deck
