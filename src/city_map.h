@@ -38,5 +38,6 @@ void setInitialInfections();
 void setCityInfectionLevel(uint8_t cityIndex, uint8_t level);
 void incrementCityInfection(uint8_t cityIndex);
 void triggerOutbreak(uint8_t cityIndex);
+void setupCityMap();
 
 #endif // CITY_MAP_H

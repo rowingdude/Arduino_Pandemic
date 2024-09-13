@@ -22,6 +22,13 @@ uint8_t cityInfectionLevels[CITY_COUNT] = {0};
 uint8_t researchCenters = 0;
 uint8_t cityHasResearchCenter[CITY_COUNT / 8 + 1] = {0};
 
+void setupCityMap() {
+    initializeCityMap();
+    setupCityConnections();
+    shuffleCities();
+    setInitialInfections();
+}
+
 void initializeCityMap() {
     researchCenters = 0;
     for (uint8_t i = 0; i < (CITY_COUNT / 8 + 1); i++) {
@@ -80,5 +87,9 @@ void incrementCityInfection(uint8_t cityIndex) {
 }  // Function increments infection level and potentially triggers outbreak
 
 void triggerOutbreak(uint8_t cityIndex) {
-    // Placeholder for outbreak logic
-}  // Function handles city outbreak (to be implemented)
+    for (uint8_t i = 0; i < CITY_COUNT; i++) {
+        if (areCitiesConnected(cityIndex, i)) {
+            incrementCityInfection(i);
+        }
+    }
+}
