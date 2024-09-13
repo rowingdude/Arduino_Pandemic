@@ -12,10 +12,10 @@
  * MIT License
  *****************************************************************************/
 
-#include "city_map.h"
-#include "led_control.h"
-#include "random_generator.h"
-#include "disease_management.h"
+#include "include/city_map.h"
+#include "include/led_control.h"
+#include "include/random_generator.h"
+#include "include/disease_management.h"
 
 const char* cityNames[CITY_COUNT] = {/* ... city names ... */};
 uint8_t cityInfectionLevels[CITY_COUNT] = {0};

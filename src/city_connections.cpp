@@ -1,4 +1,4 @@
-#include "city_connections.h"
+#include "include/city_connections.h"
 #include <avr/pgmspace.h>
 
 static HashNode* hashTable[HASH_TABLE_SIZE];

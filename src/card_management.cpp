@@ -1,36 +1,78 @@
-/******************************************************************************
- * Author: Benjamin Cance
- * Game: Arduino Pandemic for the Mega2560
- * Date: 3-Sept-2024
- * Version: 1.0
- * 
- * This file is part of the Arduino Pandemic project, a faithful 
- * implementation of the Pandemic board game for the Mega2560 platform.
- * 
- * Copyright (c) 2024 Benjamin Cance
- * 
- * MIT License
- *****************************************************************************/
-
 #include "card_management.h"
-#include "random_generator.h"
+#include "rng.h"
+
+Card playerDeck[PLAYER_DECK_SIZE];
+Card infectionDeck[INFECTION_DECK_SIZE];
+uint8_t playerDeckTop = 0, infectionDeckTop = 0;
 
 void initializeDecks() {
-    // Placeholder for deck initialization
-}  // Function initializes player and infection decks
+    // Initialize player deck with city cards
+    for (uint8_t i = 0; i < CITY_COUNT; i++) {
+        playerDeck[i].type = CARD_CITY;
+        playerDeck[i].value = i;
+    }
+    playerDeckTop = CITY_COUNT;
 
-void drawPlayerCard() {
-    // Placeholder for drawing player card
-}  // Function draws a player card
+    // Initialize infection deck
+    for (uint8_t i = 0; i < CITY_COUNT; i++) {
+        infectionDeck[i].type = CARD_CITY;
+        infectionDeck[i].value = i;
+    }
+    infectionDeckTop = CITY_COUNT;
 
-void drawInfectionCard() {
-    // Placeholder for drawing infection card
-}  // Function draws an infection card
+    shufflePlayerDeck();
+    shuffleInfectionDeck();
+}
+
+Card drawPlayerCard() {
+    if (playerDeckTop > 0) {
+        return playerDeck[--playerDeckTop];
+    }
+    // Handle game over condition here
+    Card emptyCard = {CARD_CITY, 0xFF};
+    return emptyCard;
+}
+
+Card drawInfectionCard() {
+    if (infectionDeckTop > 0) {
+        return infectionDeck[--infectionDeckTop];
+    }
+    // Handle empty infection deck (reshuffle discard pile)
+    Card emptyCard = {CARD_CITY, 0xFF};
+    return emptyCard;
+}
 
 void shufflePlayerDeck() {
-    // Placeholder for shuffling player deck
-}  // Function shuffles the player deck
+    for (int i = playerDeckTop - 1; i > 0; i--) {
+        int j = getRandomNumber() % (i + 1);
+        Card temp = playerDeck[i];
+        playerDeck[i] = playerDeck[j];
+        playerDeck[j] = temp;
+    }
+}
 
 void shuffleInfectionDeck() {
-    // Placeholder for shuffling infection deck
-}  // Function shuffles the infection deck
+    for (int i = infectionDeckTop - 1; i > 0; i--) {
+        int j = getRandomNumber() % (i + 1);
+        Card temp = infectionDeck[i];
+        infectionDeck[i] = infectionDeck[j];
+        infectionDeck[j] = temp;
+    }
+}
+
+void addEpidemicCards(uint8_t numEpidemicCards) {
+    uint8_t deckSize = playerDeckTop;
+    uint8_t sectionSize = deckSize / numEpidemicCards;
+
+    for (uint8_t i = 0; i < numEpidemicCards; i++) {
+        Card epidemicCard = {CARD_EPIDEMIC, 0};
+        uint8_t insertPosition = i * sectionSize + (getRandomNumber() % sectionSize);
+        
+        // Shift cards to make room for the epidemic card
+        for (uint8_t j = playerDeckTop; j > insertPosition; j--) {
+            playerDeck[j] = playerDeck[j-1];
+        }
+        playerDeck[insertPosition] = epidemicCard;
+        playerDeckTop++;
+    }
+}

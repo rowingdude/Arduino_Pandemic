@@ -1,71 +1,93 @@
-/******************************************************************************
- * Author: Benjamin Cance
- * Game: Arduino Pandemic for the Mega2560
- * Date: 3-Sept-2024
- * Version: 1.0
- * 
- * This file is part of the Arduino Pandemic project, a faithful 
- * implementation of the Pandemic board game for the Mega2560 platform.
- * 
- * Copyright (c) 2024 Benjamin Cance
- * 
- * MIT License
- *****************************************************************************/
-
- #include "game_logic.h"
+#include "game_logic.h"
 #include "player.h"
-#include "disease.h"
-#include "random_generator.h"
+#include "disease_management.h"
+#include "card_management.h"
+#include "city_map.h"
+#include "ui.h"
 
-void initializeGame() {
-    initializePlayers();
+GameState gameState;
+
+void initializeGame(uint8_t numPlayers, uint8_t difficulty) {
+    initializeCityMap();
     initializeDiseases();
+    initializeDecks();
+    initializePlayers(numPlayers);
     
-    for (uint8_t i = 0; i < 9; i++) {
-        uint8_t city = getRandomCity();
-        addDiseaseCube(city);
-        if (i < 6) addDiseaseCube(city);
-        if (i < 3) addDiseaseCube(city);
-    }
-}  // Function initializes the game state
+    setInitialInfections();
+    dealInitialPlayerCards();
+    addEpidemicCards(difficulty);
+}
 
-void performPlayerTurn(uint8_t playerIndex) {
-    uint8_t actionsLeft = 4;
-    while (actionsLeft > 0) {
-        uint8_t action = getPlayerAction();
-        switch (action) {
-            case MOVE:
-                {
-                    uint8_t destination = getDestinationCity();
-                    if (movePlayer(playerIndex, destination)) {
-                        actionsLeft--;
-                    }
-                }
-                break;
-            case TREAT:
-                {
-                    uint8_t currentCity = players[playerIndex].location;
-                    removeDiseaseCube(currentCity);
-                    actionsLeft--;
-                }
-            case RESEARCHCTR:
-                {
-                    uint8_t currentCity = players[playerIndex].location;
-                    if (addResearchCenter(currentCity)) {
-                        actionsLeft--;
-                    }
-                }
-                break;
+void runGameLoop() {
+    while (!isGameOver()) {
+        // Player actions phase
+        for (uint8_t i = 0; i < 4; i++) {
+            performPlayerAction(currentPlayerIndex);
+        }
+        
+        // Draw cards phase
+        drawPlayerCards(currentPlayerIndex, 2);
+        
+        // Infect cities phase
+        infectCities();
+        
+        // Move to next player
+        currentPlayerIndex = (currentPlayerIndex + 1) % MAX_PLAYERS;
+    }
+    
+    displayGameResult();
+}
+
+void performPlayerAction(uint8_t playerIndex) {
+    uint8_t action = getUserAction();
+    switch (action) {
+        case ACTION_MOVE:
+            handlePlayerMove(playerIndex);
+            break;
+        case ACTION_TREAT:
+            handleTreatDisease(playerIndex);
+            break;
+        case ACTION_BUILD:
+            handleBuildResearchStation(playerIndex);
+            break;
+        case ACTION_CURE:
+            handleDiscoverCure(playerIndex);
+            break;
+        // Add more actions as needed
+    }
+}
+
+void drawPlayerCards(uint8_t playerIndex, uint8_t numCards) {
+    for (uint8_t i = 0; i < numCards; i++) {
+        Card drawnCard = drawPlayerCard();
+        if (drawnCard.type == CARD_EPIDEMIC) {
+            handleEpidemic();
+        } else {
+            addCardToPlayer(playerIndex, drawnCard);
         }
     }
-    drawPlayerCards();
-    infectCities();
-}  // Function handles a player's turn
+}
 
 void infectCities() {
-    uint8_t infectionRate = getCurrentInfectionRate();
+    uint8_t infectionRate = getInfectionRate();
     for (uint8_t i = 0; i < infectionRate; i++) {
-        uint8_t city = getRandomCity();
-        addDiseaseCube(city);
+        Card infectionCard = drawInfectionCard();
+        addDiseaseCube(infectionCard.value, getCityDiseaseType(infectionCard.value));
     }
-}  // Function infects cities at the end of a turn
+}
+
+bool isGameOver() {
+    // Check win conditions
+    if (areAllDiseasesCured()) {
+        gameState.result = GAME_WIN;
+        return true;
+    }
+    
+    // Check lose conditions
+    if (isOutbreakLimitReached() || arePlayerCardsExhausted() || areDiseaseCubesExhausted()) {
+        gameState.result = GAME_LOSE;
+        return true;
+    }
+    
+    return false;
+}
